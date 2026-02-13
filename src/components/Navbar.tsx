@@ -33,7 +33,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <a href="#chapter-0" className="flex items-center gap-2 group">
           <Coffee className="w-6 h-6 text-coffee-500 group-hover:text-coffee-400 transition-colors" />
-          <span className="font-serif text-lg font-semibold text-cream-100 tracking-wide">
+          <span className="font-serif text-lg font-semibold text-coffee-900 tracking-wide">
             Brew & Beyond
           </span>
         </a>
@@ -43,28 +43,28 @@ export default function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-xs text-cream-200/70 hover:text-coffee-400 transition-colors tracking-wider uppercase"
+              className="text-xs text-coffee-800/60 hover:text-coffee-500 transition-colors tracking-wider uppercase"
             >
               {link.label}
             </a>
           ))}
           <button
             onClick={toggleLang}
-            className="flex items-center gap-1 text-xs text-cream-300/60 hover:text-coffee-400 transition-colors"
+            className="flex items-center gap-1 text-xs text-coffee-700/50 hover:text-coffee-500 transition-colors"
           >
             <Globe className="w-3.5 h-3.5" />
             {i18n.language === 'vi' ? 'EN' : 'VI'}
           </button>
           <a
             href="#chapter-5"
-            className="px-5 py-2 bg-coffee-700/80 hover:bg-coffee-600 text-cream-50 text-xs rounded-full transition-all tracking-wider backdrop-blur-sm"
+            className="px-5 py-2 bg-coffee-700/90 hover:bg-coffee-600 text-cream-50 text-xs rounded-full transition-all tracking-wider backdrop-blur-sm"
           >
             {t('nav.order')}
           </a>
         </div>
 
         <button
-          className="md:hidden text-cream-100"
+          className="md:hidden text-coffee-900"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
@@ -85,14 +85,14 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="text-cream-200 hover:text-coffee-400 transition-colors tracking-wide text-sm"
+                  className="text-coffee-800 hover:text-coffee-500 transition-colors tracking-wide text-sm"
                 >
                   {link.label}
                 </a>
               ))}
               <button
                 onClick={toggleLang}
-                className="flex items-center gap-1 text-cream-300 hover:text-coffee-400 transition-colors text-sm"
+                className="flex items-center gap-1 text-coffee-700 hover:text-coffee-500 transition-colors text-sm"
               >
                 <Globe className="w-4 h-4" />
                 {i18n.language === 'vi' ? 'English' : 'Tiếng Việt'}

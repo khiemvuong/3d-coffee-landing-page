@@ -3,7 +3,7 @@ import { Coffee } from 'lucide-react'
 
 export default function LoadingScreen() {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0605]">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#faf5ef]">
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -26,12 +26,12 @@ export default function LoadingScreen() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mt-6 text-coffee-300 font-serif text-lg tracking-widest"
+        className="mt-6 text-coffee-700 font-serif text-lg tracking-widest"
       >
         BREW & BEYOND
       </motion.p>
       <motion.div
-        className="mt-4 w-48 h-0.5 bg-coffee-900 rounded-full overflow-hidden"
+        className="mt-4 w-48 h-0.5 bg-coffee-200 rounded-full overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}

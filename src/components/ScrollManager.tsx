@@ -14,11 +14,22 @@ export default function ScrollManager() {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
       const progress = Math.min(scrollY / docHeight, 1)
       setScrollProgress(progress)
-      const chapter = Math.min(
-        Math.floor(progress * CHAPTER_COUNT),
-        CHAPTER_COUNT - 1
-      )
-      setCurrentChapter(chapter)
+
+      // DOM-based chapter detection — find which chapter section we're in
+      let active = 0
+      const vh = window.innerHeight
+      for (let i = CHAPTER_COUNT - 1; i >= 0; i--) {
+        const el = document.getElementById(`chapter-${i}`)
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          // Chapter is active when its top is at or above 40% of viewport
+          if (rect.top <= vh * 0.4) {
+            active = i
+            break
+          }
+        }
+      }
+      setCurrentChapter(active)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -26,11 +37,11 @@ export default function ScrollManager() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [setScrollProgress, setCurrentChapter])
 
-  // Spacer divs to create scroll height - each chapter = 100vh
+  // Spacer divs — 140vh each: 100vh visible content + 40vh dwell zone for 3D animation
   return (
     <div ref={containerRef} className="relative">
       {Array.from({ length: CHAPTER_COUNT }).map((_, i) => (
-        <div key={i} className="h-screen" id={`chapter-${i}`} />
+        <div key={i} className="h-[140vh]" id={`chapter-${i}`} />
       ))}
     </div>
   )

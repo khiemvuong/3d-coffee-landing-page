@@ -1,6 +1,7 @@
 import { Suspense, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Preload } from '@react-three/drei'
+import * as THREE from 'three'
 import Navbar from './components/Navbar'
 import ScrollManager from './components/ScrollManager'
 import CoffeeScene3D from './components/CoffeeScene3D'
@@ -37,9 +38,14 @@ export default function App() {
         <Canvas
           shadows
           dpr={[1, 1.5]}
-          gl={{ antialias: true, alpha: false }}
+          gl={{
+            antialias: true,
+            alpha: false,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 1.0,
+          }}
           camera={{ position: [0, 1, 7], fov: 45, near: 0.1, far: 50 }}
-          style={{ background: '#0a0605' }}
+          style={{ background: '#faf5ef' }}
         >
           <Suspense fallback={null}>
             <CoffeeScene3D />

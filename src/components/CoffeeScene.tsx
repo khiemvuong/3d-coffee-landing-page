@@ -33,7 +33,7 @@ function CoffeeCup() {
         <meshStandardMaterial color="#c06624" roughness={0.4} metalness={0.2} />
       </mesh>
       {/* Handle */}
-      <mesh position={[1.35, 0.6, 0]} rotation={[0, 0, Math.PI / 2]}>
+      <mesh position={[-1.35, 0.6, 0]} rotation={[0, 0, -Math.PI / 2]}>
         <torusGeometry args={[0.35, 0.08, 8, 32, Math.PI]} />
         <meshStandardMaterial color="#f5f0e8" roughness={0.3} metalness={0.1} />
       </mesh>

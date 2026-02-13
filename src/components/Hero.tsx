@@ -12,8 +12,8 @@ export default function Hero() {
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0605] via-[#1a100c] to-[#0a0605]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,128,46,0.08)_0%,transparent_70%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0c0704] via-[#1a100a] to-[#0c0704]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(196,120,48,0.1)_0%,transparent_70%)]" />
 
       {/* 3D Canvas */}
       <div className="absolute right-0 top-0 w-full md:w-[55%] h-full">

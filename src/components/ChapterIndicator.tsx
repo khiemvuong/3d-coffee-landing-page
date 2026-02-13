@@ -3,11 +3,11 @@ import { useAppStore } from '../store/useAppStore'
 
 const chapterNames = [
   'Brew & Beyond',
-  'Nguồn gốc',
-  'Quy trình',
-  'Rang',
+  'Nguồn cội',
+  'Nghi thức',
+  'Lửa thiêng',
   'Trải nghiệm',
-  'Thực đơn',
+  'Danh mục',
 ]
 
 export default function ChapterIndicator() {
@@ -29,7 +29,7 @@ export default function ChapterIndicator() {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
-                  className="text-xs text-coffee-400/80 tracking-wider uppercase whitespace-nowrap"
+                  className="text-xs text-coffee-600/70 tracking-wider uppercase whitespace-nowrap"
                 >
                   {name}
                 </motion.span>
@@ -39,14 +39,14 @@ export default function ChapterIndicator() {
               <div
                 className={`w-2 h-2 rounded-full transition-all duration-500 ${
                   isActive
-                    ? 'bg-coffee-400 scale-125 shadow-[0_0_8px_rgba(212,128,46,0.5)]'
-                    : 'bg-cream-400/20 group-hover:bg-cream-400/40'
+                    ? 'bg-coffee-500 scale-125 shadow-[0_0_8px_rgba(168,90,36,0.35)]'
+                    : 'bg-coffee-300/30 group-hover:bg-coffee-400/40'
                 }`}
               />
               {isActive && (
                 <motion.div
                   layoutId="chapter-ring"
-                  className="absolute w-5 h-5 rounded-full border border-coffee-500/40"
+                  className="absolute w-5 h-5 rounded-full border border-coffee-400/40"
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}

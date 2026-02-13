@@ -15,7 +15,7 @@ export default function ScrollHint() {
       transition={{ delay: 2, duration: 1 }}
       className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2"
     >
-      <span className="text-cream-400/40 text-xs tracking-[0.2em] uppercase">Scroll</span>
+      <span className="text-coffee-400/50 text-xs tracking-[0.2em] uppercase">Scroll</span>
       <motion.div
         animate={{ y: [0, 8, 0] }}
         transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
