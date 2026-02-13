@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #0a0605;
+  color: #fdf8f0;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar for immersive feel, but keep scroll functional */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.glass {
+  background: rgba(10, 6, 5, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(212, 128, 46, 0.08);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #f4deb3 0%, #d4802e 50%, #6c351e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Smooth pointer events for chapters */
+.pointer-events-none a,
+.pointer-events-none button,
+.pointer-events-none .pointer-events-auto {
+  pointer-events: auto;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(212, 128, 46, 0.3);
+  color: #fdf8f0;
+}
