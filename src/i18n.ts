@@ -7,6 +7,7 @@ const resources = {
     translation: {
       nav: {
         home: 'Trang chủ',
+        origin: 'Nguồn cội',
         menu: 'Danh mục',
         about: 'Gia phả',
         contact: 'Thư tín',
@@ -45,33 +46,33 @@ const resources = {
         subtitle: 'Những kiệt tác cà phê được sủng ái nhất',
         items: {
           espresso: {
-            name: 'Espresso Đế Vương',
-            desc: 'Đậm đà, uy nghi với lớp crema vàng kim rực rỡ',
+            name: 'Espresso Signature',
+            desc: 'Đậm đà, tinh tế với lớp crema vàng óng rực rỡ',
             price: '55.000₫',
           },
           cappuccino: {
             name: 'Cappuccino Hoàng Gia',
-            desc: 'Espresso hòa quyện cùng bọt sữa như lụa Ý tuyệt mỹ',
+            desc: 'Espresso hòa quyện cùng bọt sữa lụa Ý tuyệt mỹ',
             price: '65.000₫',
           },
           pourover: {
-            name: 'Pour Over Cao Nguyên',
-            desc: 'Cà phê đặc sản từ đỉnh cao nguyên Việt Nam hùng vĩ',
+            name: 'Pour Over Speciality',
+            desc: 'Cà phê đặc sản từ những vùng cao nguyên trứ danh',
             price: '75.000₫',
           },
           coldbrew: {
-            name: 'Cold Brew Trầm Mặc',
-            desc: 'Ủ lạnh suốt 24 giờ, cho vị thanh nhã tự nhiên thuần khiết',
+            name: 'Cold Brew Nguyên Bản',
+            desc: 'Ủ lạnh suốt 24 giờ, cho vị thanh nhẹ tự nhiên tinh khiết',
             price: '70.000₫',
           },
           latte: {
-            name: 'Latte Nghệ Thuật Hoàng Kim',
-            desc: 'Latte kiệt tác với caramel thượng hạng đỉnh cao',
+            name: 'Caramel Macchiato',
+            desc: 'Sự kết hợp hoàn hảo giữa Espresso và sốt Caramel thượng hạng',
             price: '72.000₫',
           },
           vietnamese: {
-            name: 'Cà Phê Sữa Đá Huyền Thoại',
-            desc: 'Di sản cà phê bất hủ của dân tộc Việt Nam',
+            name: 'Phin Sữa Đá Di Sản',
+            desc: 'Hương vị cà phê Phin đậm nét văn hóa Việt Nam',
             price: '45.000₫',
           },
         },
@@ -102,6 +103,7 @@ const resources = {
     translation: {
       nav: {
         home: 'Residence',
+        origin: 'Terroir',
         menu: 'Repertoire',
         about: 'Lineage',
         contact: 'Correspondence',
@@ -140,8 +142,8 @@ const resources = {
         subtitle: 'Our most celebrated and revered compositions',
         items: {
           espresso: {
-            name: 'The Imperial Espresso',
-            desc: 'Commanding and resolute, crowned with a gilded crema of regal splendour',
+            name: 'Signature Espresso',
+            desc: 'Powerful and refined, crowned with a brilliant golden crema',
             price: '$2.50',
           },
           cappuccino: {
@@ -150,23 +152,23 @@ const resources = {
             price: '$3.00',
           },
           pourover: {
-            name: 'Highland Pour Over',
-            desc: 'A rare single-origin treasure from the majestic Vietnamese highlands',
+            name: 'Speciality Pour Over',
+            desc: 'A curated single-origin treasure from renowned highland estates',
             price: '$3.50',
           },
           coldbrew: {
-            name: 'The Midnight Elixir',
-            desc: 'Patiently steeped for four-and-twenty hours in contemplative cold repose',
+            name: 'Ancestral Cold Brew',
+            desc: 'Patiently steeped for four-and-twenty hours for a pure, light finish',
             price: '$3.20',
           },
           latte: {
-            name: 'Golden Caramel Artistry',
-            desc: 'A masterful latte adorned with the finest amber caramel crowned',
+            name: 'Caramel Macchiato',
+            desc: 'The perfect marriage of Espresso and premium amber caramel',
             price: '$3.30',
           },
           vietnamese: {
-            name: 'Saigon Heritage',
-            desc: 'The immortal legacy of traditional Vietnamese coffee, bold and eternal',
+            name: 'Artisan Phin Milk Coffee',
+            desc: 'The immortal soul of traditional Vietnamese coffee culture',
             price: '$2.00',
           },
         },

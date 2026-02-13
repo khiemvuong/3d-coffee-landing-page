@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { Preload } from '@react-three/drei'
 import * as THREE from 'three'
 import Navbar from './components/Navbar'
-import ScrollManager from './components/ScrollManager'
+import { ScrollManager } from './components/ScrollManager'
 import CoffeeScene3D from './components/CoffeeScene3D'
 import ChapterIndicator from './components/ChapterIndicator'
 import ScrollHint from './components/ScrollHint'
@@ -18,9 +18,13 @@ import {
   MenuChapter,
 } from './components/Chapters'
 import { useAppStore } from './store/useAppStore'
+import { useSmoothScroll } from './hooks/useSmoothScroll'
 
 export default function App() {
   const { isLoading, setLoading } = useAppStore()
+  
+  // Initialize smooth scroll
+  useSmoothScroll()
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000)
@@ -61,20 +65,15 @@ export default function App() {
         <ChapterIndicator />
         <ScrollHint />
 
-        {/* Chapters - each takes full viewport height via ScrollManager */}
+        {/* Chapters - following natural scroll flow */}
         <div className="relative">
-          {/* Invisible scroll spacers */}
           <ScrollManager />
-
-          {/* Visible overlays pinned to each chapter */}
-          <div className="absolute inset-0 pointer-events-none">
-            <HeroChapter />
-            <OriginChapter />
-            <ProcessChapter />
-            <RoastChapter />
-            <ExperienceChapter />
-            <MenuChapter />
-          </div>
+          <HeroChapter />
+          <OriginChapter />
+          <ProcessChapter />
+          <RoastChapter />
+          <ExperienceChapter />
+          <MenuChapter />
         </div>
       </div>
     </>

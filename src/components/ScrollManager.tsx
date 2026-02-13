@@ -1,29 +1,29 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useAppStore } from '../store/useAppStore'
 
 const CHAPTER_COUNT = 6
 
-export default function ScrollManager() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const setScrollProgress = useAppStore((s) => s.setScrollProgress)
-  const setCurrentChapter = useAppStore((s) => s.setCurrentChapter)
+export function ScrollManager() {
+  const { setCurrentChapter, setScrollProgress } = useAppStore()
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const progress = Math.min(scrollY / docHeight, 1)
+      const progress = Math.min(scrollY / Math.max(docHeight, 1), 1)
       setScrollProgress(progress)
 
-      // DOM-based chapter detection — find which chapter section we're in
-      let active = 0
+      // Detect active chapter based on which element is most visible in the center
       const vh = window.innerHeight
-      for (let i = CHAPTER_COUNT - 1; i >= 0; i--) {
+      const center = scrollY + vh / 2
+      
+      let active = 0
+      for (let i = 0; i < CHAPTER_COUNT; i++) {
         const el = document.getElementById(`chapter-${i}`)
         if (el) {
           const rect = el.getBoundingClientRect()
-          // Chapter is active when its top is at or above 40% of viewport
-          if (rect.top <= vh * 0.4) {
+          const absoluteTop = rect.top + scrollY
+          if (center >= absoluteTop && center <= absoluteTop + rect.height) {
             active = i
             break
           }
@@ -32,17 +32,10 @@ export default function ScrollManager() {
       setCurrentChapter(active)
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('scroll', handleScroll)
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [setScrollProgress, setCurrentChapter])
 
-  // Spacer divs — 140vh each: 100vh visible content + 40vh dwell zone for 3D animation
-  return (
-    <div ref={containerRef} className="relative">
-      {Array.from({ length: CHAPTER_COUNT }).map((_, i) => (
-        <div key={i} className="h-[140vh]" id={`chapter-${i}`} />
-      ))}
-    </div>
-  )
+  return null
 }

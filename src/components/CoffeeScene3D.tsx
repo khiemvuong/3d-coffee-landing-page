@@ -34,18 +34,27 @@ interface ChapterPose {
 }
 
 const CHAPTER_POSES: ChapterPose[] = [
-  // Ch0 Hero — right of centre, large, slow majestic spin
-  { x: 1.8, y: -0.1, z: 0.5, scale: 3.5, rotSpeed: 0.15, tiltX: 0, tiltZ: 0 },
-  // Ch1 Origin — left side, gentle tilt
-  { x: -2.0, y: 0.1, z: 0, scale: 3.2, rotSpeed: 0.10, tiltX: 0.08, tiltZ: -0.12 },
-  // Ch2 Process — slight right, elevated, medium spin
-  { x: 1.6, y: 0.8, z: -0.5, scale: 3.4, rotSpeed: 0.20, tiltX: -0.1, tiltZ: 0 },
-  // Ch3 Roast — right side, big & dramatic close-up
-  { x: 2.0, y: -0.2, z: 1.5, scale: 4.2, rotSpeed: 0.15, tiltX: 0, tiltZ: 0.08 },
-  // Ch4 Experience — left side, floating feel
-  { x: -1.8, y: 0.5, z: 0, scale: 3.6, rotSpeed: 0.18, tiltX: 0.05, tiltZ: -0.05 },
-  // Ch5 Menu — top-center, pulled back, small
-  { x: 0, y: 1.5, z: -1, scale: 2.8, rotSpeed: 0.12, tiltX: -0.15, tiltZ: 0 },
+  // Ch0 Hero — right side, majestic
+  { x: 2.8, y: 1.2, z: 0.5, scale: 3.5, rotSpeed: 0.15, tiltX: 0, tiltZ: 0 },
+  // Ch1 Origin — left side, larger & lower & closer
+  { x: -2.0, y: 0.8, z: 1.2, scale: 4.0, rotSpeed: 0.10, tiltX: 0.08, tiltZ: -0.12 },
+  // Ch2 Process — right side, lowered & closer
+  { x: 1.8, y: 1.0, z: 0.8, scale: 3.4, rotSpeed: 0.20, tiltX: -0.1, tiltZ: 0 },
+  // Ch3 Roast — right side, lowered
+  { x: 2.2, y: 0.8, z: 1.5, scale: 4.2, rotSpeed: 0.15, tiltX: 0, tiltZ: 0.08 },
+  // Ch4 Experience — left side, closer
+  { x: -2.0, y: 1.6, z: 1.5, scale: 3.6, rotSpeed: 0.18, tiltX: 0.05, tiltZ: -0.05 },
+  // Ch5 Menu — top center
+  { x: 0, y: 2.5, z: -1, scale: 2.8, rotSpeed: 0.12, tiltX: -0.15, tiltZ: 0 },
+]
+
+const CAMERA_POSES = [
+  { pos: { x: 0, y: 1.5, z: 7 }, look: { x: 0, y: 0.8, z: 0 } },      // Ch0 Hero
+  { pos: { x: 2, y: 2.0, z: 6 }, look: { x: -1, y: 0.5, z: 0 } },     // Ch1 Origin
+  { pos: { x: -1, y: 2.0, z: 5 }, look: { x: 0, y: 0.5, z: 0 } },     // Ch2 Process
+  { pos: { x: 0, y: 1.2, z: 4.5 }, look: { x: 1, y: 0.3, z: 0 } },    // Ch3 Roast
+  { pos: { x: 1, y: 2.0, z: 6.5 }, look: { x: -0.5, y: 1.2, z: 0 } },  // Ch4 Experience
+  { pos: { x: -0.5, y: 1.5, z: 7 }, look: { x: 0.5, y: 0.8, z: 0 } },  // Ch5 Menu
 ]
 
 /* ─── Coffee Cup — GLB Model with DOM-based chapter detection ─── */
@@ -105,63 +114,87 @@ function CoffeeCup({ scrollProgress }: { scrollProgress: number }) {
     }
   }, [])
 
+  const { viewport } = useThree()
+
+  // ── Measure anchor positions from the DOM ──
+  const getAnchorPos = (name: string) => {
+    const el = document.querySelector(`[data-cake-anchor="${name}"]`)
+    if (!el) return null
+
+    const rect = el.getBoundingClientRect()
+    // Center of the anchor in screen pixels
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+
+    // Convert to NDC (-1 to 1)
+    const xNDC = (cx / window.innerWidth) * 2 - 1
+    const yNDC = -((cy / window.innerHeight) * 2 - 1)
+
+    // Convert to 3D World coordinates based on current viewport
+    return {
+      x: (xNDC * viewport.width) / 2,
+      y: (yNDC * viewport.height) / 2,
+    }
+  }
+
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime
     const g = groupRef.current
     const rg = rotGroupRef.current
     if (!g || !rg) return
 
-    const sy = scrollRef.current
-    const bounds = chapterBounds.current
+    // ── Continuous Scroll Index Logic with Hero Dead-zone ──
     const vh = window.innerHeight
+    const scrollY = window.scrollY
+    
+    // Add a small initial buffer so the cup doesn't move immediately on the first pixel of scroll
+    const startBuffer = 0.05 
+    const effectiveScroll = Math.max(scrollY / vh - (window.scrollY < vh ? startBuffer : 0), 0)
+    const scrollIndex = effectiveScroll / (window.scrollY < vh ? (1 - startBuffer) : 1)
+    
+    // Identify the two chapters we are blending between
+    const baseIdx = Math.min(Math.floor(scrollIndex), CHAPTER_COUNT - 2)
+    const nextIdx = baseIdx + 1
+    const chapterNames = ['hero', 'origin', 'process', 'roast', 'experience', 'menu']
+    
+    // Custom easing for a more relaxed 'breakout' from chapters
+    const rawT = scrollIndex - baseIdx
+    const easedT = rawT < 0.5 ? 2 * rawT * rawT : 1 - Math.pow(-2 * rawT + 2, 2) / 2 // Simple ease-in-out
+    const blend = THREE.MathUtils.smoothstep(Math.min(Math.max(easedT, 0), 1), 0, 1)
 
-    // ── Determine active chapter & local progress (0-1 within chapter) ──
-    let activeChapter = 0
-    let localT = 0
+    // Get anchor positions for the two chapters
+    const currAnchor = getAnchorPos(chapterNames[baseIdx])
+    const nextAnchor = getAnchorPos(chapterNames[nextIdx])
 
-    if (bounds.length === CHAPTER_COUNT) {
-      for (let i = CHAPTER_COUNT - 1; i >= 0; i--) {
-        const b = bounds[i]
-        if (sy >= b.top - vh * 0.3) {
-          activeChapter = i
-          const range = Math.max(b.height, 1)
-          localT = Math.min(Math.max((sy - (b.top - vh * 0.3)) / range, 0), 1)
-          break
-        }
-      }
-    } else {
-      // Fallback to scrollProgress
-      activeChapter = Math.min(Math.floor(scrollProgress * CHAPTER_COUNT), CHAPTER_COUNT - 1)
-      localT = (scrollProgress * CHAPTER_COUNT) - activeChapter
-    }
+    // Base pose configs
+    const currPose = CHAPTER_POSES[baseIdx]
+    const nextPose = CHAPTER_POSES[nextIdx]
 
-    // ── Interpolate between current and next chapter pose ──
-    const curr = CHAPTER_POSES[activeChapter]
-    const next = CHAPTER_POSES[Math.min(activeChapter + 1, CHAPTER_COUNT - 1)]
-    // Use smoothstep for transitions
-    const blend = localT * localT * (3 - 2 * localT)
-
-    const targetX = curr.x + (next.x - curr.x) * blend
-    const targetY = curr.y + (next.y - curr.y) * blend
-    const targetZ = curr.z + (next.z - curr.z) * blend
-    const targetScale = curr.scale + (next.scale - curr.scale) * blend
-    const rotSpeed = curr.rotSpeed + (next.rotSpeed - curr.rotSpeed) * blend
-    const tiltX = curr.tiltX + (next.tiltX - curr.tiltX) * blend
-    const tiltZ = curr.tiltZ + (next.tiltZ - curr.tiltZ) * blend
+    // Final Target Values
+    // X, Y come from Dynamic Anchors
+    const targetX = (currAnchor?.x ?? currPose.x) + ((nextAnchor?.x ?? nextPose.x) - (currAnchor?.x ?? currPose.x)) * blend
+    const targetY = (currAnchor?.y ?? currPose.y) + ((nextAnchor?.y ?? nextPose.y) - (currAnchor?.y ?? currPose.y)) * blend
+    
+    // Z, Scale, Roast etc come from Pose Configs
+    const targetZ = currPose.z + (nextPose.z - currPose.z) * blend
+    const targetScale = currPose.scale + (nextPose.scale - currPose.scale) * blend
+    const rotSpeed = currPose.rotSpeed + (nextPose.rotSpeed - currPose.rotSpeed) * blend
+    const tiltX = currPose.tiltX + (nextPose.tiltX - currPose.tiltX) * blend
+    const tiltZ = currPose.tiltZ + (nextPose.tiltZ - currPose.tiltZ) * blend
 
     // Gentle floating bob
     const bob = Math.sin(t * 0.6) * 0.08
 
-    // ── Damp position ──
-    const spd = 4
+    // ── Damp movement (Slowed down for cinematic feel) ──
+    const spd = 4 
     g.position.x = damp(g.position.x, targetX, spd, delta)
     g.position.y = damp(g.position.y, targetY + bob, spd, delta)
     g.position.z = damp(g.position.z, targetZ, spd, delta)
     const s = damp(g.scale.x, targetScale, spd, delta)
     g.scale.set(s, s, s)
 
-    // ── Rotation on inner group (spins around own axis) ──
-    rg.rotation.y = damp(rg.rotation.y, t * rotSpeed, 2, delta)
+    // ── Rotation ──
+    rg.rotation.y += delta * rotSpeed
     rg.rotation.x = damp(rg.rotation.x, tiltX, 3, delta)
     rg.rotation.z = damp(rg.rotation.z, tiltZ, 3, delta)
   })
@@ -177,6 +210,15 @@ function CoffeeCup({ scrollProgress }: { scrollProgress: number }) {
           receiveShadow
         />
       </group>
+
+      {/* 
+        Nested elements that should follow the cup's world position 
+        (the dynamic anchor calculation)
+      */}
+      <FloatingBeans scrollProgress={scrollProgress} />
+      <SteamParticles scrollProgress={scrollProgress} />
+      <CoffeeDust scrollProgress={scrollProgress} />
+      <OrbitalRings scrollProgress={scrollProgress} />
     </group>
   )
 }
@@ -253,8 +295,8 @@ function CoffeeBean({ position, scrollProgress, index }: {
         />
       </mesh>
       {/* Bean crease */}
-      <mesh position={[0, 0, 0.1]} rotation={[Math.PI / 2, 0, 0]}>
-        <boxGeometry args={[0.015, 0.06, 0.2]} />
+      <mesh position={[0, 0, 0.09]} rotation={[Math.PI / 2, 0, 0]}>
+        <boxGeometry args={[0.015, 0.06, 0.1]} />
         <meshStandardMaterial color="#0a0200" roughness={0.9} />
       </mesh>
     </group>
@@ -584,41 +626,47 @@ function DynamicLights({ scrollProgress }: { scrollProgress: number }) {
 }
 
 /* ─── Camera Controller ─── */
-function CameraController({ scrollProgress }: { scrollProgress: number }) {
+function CameraController() {
   const { camera } = useThree()
   const targetPos = useRef(new THREE.Vector3(0, 1, 7))
 
   useFrame((_, delta) => {
-    let camTarget = { x: 0, y: 1, z: 7 }
-    let lookTarget = { x: 0, y: 0, z: 0 }
+    const vh = window.innerHeight
+    const scrollY = window.scrollY
+    
+    // Synchronized Hero Dead-zone for camera
+    const startBuffer = 0.05
+    const effectiveScroll = Math.max(scrollY / vh - (window.scrollY < vh ? startBuffer : 0), 0)
+    const scrollIndex = effectiveScroll / (window.scrollY < vh ? (1 - startBuffer) : 1)
+    
+    // Identify blending chapters for camera
+    const baseIdx = Math.min(Math.floor(scrollIndex), CHAPTER_COUNT - 2)
+    const nextIdx = baseIdx + 1
+    const rawT = scrollIndex - baseIdx
+    const easedT = rawT < 0.5 ? 2 * rawT * rawT : 1 - Math.pow(-2 * rawT + 2, 2) / 2
+    const blend = THREE.MathUtils.smoothstep(Math.min(Math.max(easedT, 0), 1), 0, 1)
 
-    if (scrollProgress < 0.17) {
-      camTarget = { x: 0, y: 1, z: 7 }
-      lookTarget = { x: 0, y: 0, z: 0 }
-    } else if (scrollProgress < 0.33) {
-      camTarget = { x: 2, y: 1.5, z: 6 }
-      lookTarget = { x: -1, y: 0, z: 0 }
-    } else if (scrollProgress < 0.50) {
-      camTarget = { x: -1, y: 2.5, z: 5 }
-      lookTarget = { x: 0, y: 1, z: 0 }
-    } else if (scrollProgress < 0.67) {
-      camTarget = { x: 0, y: 0.5, z: 4.5 }
-      lookTarget = { x: 1, y: 0, z: 0 }
-    } else if (scrollProgress < 0.83) {
-      camTarget = { x: 1, y: 1.5, z: 6.5 }
-      lookTarget = { x: -0.5, y: 0.5, z: 0 }
-    } else {
-      camTarget = { x: -0.5, y: 0.8, z: 7 }
-      lookTarget = { x: 0.5, y: -0.3, z: 0 }
-    }
+    const curr = CAMERA_POSES[baseIdx]
+    const next = CAMERA_POSES[nextIdx]
 
-    camera.position.x = damp(camera.position.x, camTarget.x, 1.5, delta)
-    camera.position.y = damp(camera.position.y, camTarget.y, 1.5, delta)
-    camera.position.z = damp(camera.position.z, camTarget.z, 1.5, delta)
+    // Calculate dynamic targets
+    const camX = curr.pos.x + (next.pos.x - curr.pos.x) * blend
+    const camY = curr.pos.y + (next.pos.y - curr.pos.y) * blend
+    const camZ = curr.pos.z + (next.pos.z - curr.pos.z) * blend
 
-    targetPos.current.x = damp(targetPos.current.x, lookTarget.x, 1.5, delta)
-    targetPos.current.y = damp(targetPos.current.y, lookTarget.y, 1.5, delta)
-    targetPos.current.z = damp(targetPos.current.z, lookTarget.z, 1.5, delta)
+    const lookX = curr.look.x + (next.look.x - curr.look.x) * blend
+    const lookY = curr.look.y + (next.look.y - curr.look.y) * blend
+    const lookZ = curr.look.z + (next.look.z - curr.look.z) * blend
+
+    // Smoother damping for camera movements
+    const camSpd = 3.5
+    camera.position.x = damp(camera.position.x, camX, camSpd, delta)
+    camera.position.y = damp(camera.position.y, camY, camSpd, delta)
+    camera.position.z = damp(camera.position.z, camZ, camSpd, delta)
+
+    targetPos.current.x = damp(targetPos.current.x, lookX, camSpd, delta)
+    targetPos.current.y = damp(targetPos.current.y, lookY, camSpd, delta)
+    targetPos.current.z = damp(targetPos.current.z, lookZ, camSpd, delta)
     camera.lookAt(targetPos.current)
   })
 
@@ -633,13 +681,15 @@ export default function CoffeeScene3D() {
     <>
       <fog attach="fog" args={['#f0e6d8', 10, 35]} />
       <color attach="background" args={['#f5ebe0']} />
-      <CameraController scrollProgress={scrollProgress} />
+      <CameraController />
       <DynamicLights scrollProgress={scrollProgress} />
+      
+      {/* 
+        CoffeeCup now contains all other orbiting elements 
+        so they follow the cup's dynamic anchor position.
+      */}
       <CoffeeCup scrollProgress={scrollProgress} />
-      <FloatingBeans scrollProgress={scrollProgress} />
-      <SteamParticles scrollProgress={scrollProgress} />
-      <CoffeeDust scrollProgress={scrollProgress} />
-      <OrbitalRings scrollProgress={scrollProgress} />
+
       <Starfield />
       <GroundPlane />
     </>
