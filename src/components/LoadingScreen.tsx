@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Coffee } from 'lucide-react'
 
-export default function LoadingScreen() {
+export default function LoadingScreen({ progress }: { progress?: number }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#faf5ef]">
       <motion.div
@@ -39,8 +39,8 @@ export default function LoadingScreen() {
         <motion.div
           className="h-full bg-gradient-to-r from-coffee-700 to-coffee-400 rounded-full"
           initial={{ width: '0%' }}
-          animate={{ width: '100%' }}
-          transition={{ duration: 2, ease: 'easeInOut' }}
+          animate={{ width: `${progress ?? 100}%` }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         />
       </motion.div>
     </div>

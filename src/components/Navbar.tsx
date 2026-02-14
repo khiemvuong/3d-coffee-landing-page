@@ -33,9 +33,9 @@ import { useState } from 'react'
   
     return (
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-1000 ${
           scrolled ? 'glass py-3 shadow-[0_4px_30px_rgba(40,20,10,0.03)]' : 'py-8 bg-transparent'
         }`}

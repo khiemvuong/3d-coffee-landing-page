@@ -71,7 +71,10 @@ function CoffeeCup({ scrollProgress }: { scrollProgress: number }) {
   useMemo(() => {
     const mat = materials['Material.001']
     if (mat) {
-      mat.envMapIntensity = 1.2
+      mat.envMapIntensity = 0.4 // Very subtle reflections
+      mat.roughness = 0.65 // Matte-satin finish
+      mat.metalness = 0.0 // Pure ceramic, no metallic qualities
+      mat.color.set('#fffaf5') // Warm cream-white
       mat.needsUpdate = true
     }
   }, [materials])
@@ -562,27 +565,27 @@ function DynamicLights({ scrollProgress }: { scrollProgress: number }) {
 
     if (scrollProgress < 0.17) {
       mainTarget = { x: 5, y: 10, z: 5 }
-      accentColor = new THREE.Color('#f0b860')
+      accentColor = new THREE.Color('#f0b860') // Gold
       accentIntensity = 1.0
     } else if (scrollProgress < 0.33) {
-      mainTarget = { x: -5, y: 8, z: 3 }
-      accentColor = new THREE.Color('#3aad5e')
+      mainTarget = { x: -8, y: 6, z: 5 }
+      accentColor = new THREE.Color('#d4a060') // Bronze
       accentIntensity = 1.2
     } else if (scrollProgress < 0.50) {
-      mainTarget = { x: 0, y: 12, z: 0 }
-      accentColor = new THREE.Color('#5aade8')
+      mainTarget = { x: 2, y: 10, z: 4 } // Not directly overhead
+      accentColor = new THREE.Color('#e8c499') // Warm Cream
       accentIntensity = 1.1
     } else if (scrollProgress < 0.67) {
-      mainTarget = { x: 3, y: 6, z: -3 }
-      accentColor = new THREE.Color('#f05828')
-      accentIntensity = 1.5
+      mainTarget = { x: 5, y: 6, z: -2 }
+      accentColor = new THREE.Color('#c07030') // Coffee Orange
+      accentIntensity = 1.4
     } else if (scrollProgress < 0.83) {
-      mainTarget = { x: -3, y: 9, z: 5 }
-      accentColor = new THREE.Color('#e8a040')
+      mainTarget = { x: -4, y: 8, z: 6 }
+      accentColor = new THREE.Color('#b08050') // Soft Caramel
       accentIntensity = 1.2
     } else {
-      mainTarget = { x: 5, y: 8, z: 5 }
-      accentColor = new THREE.Color('#f4deb3')
+      mainTarget = { x: 6, y: 10, z: 6 }
+      accentColor = new THREE.Color('#fdf6ed') // Light Warm
       accentIntensity = 0.9
     }
 
@@ -600,8 +603,8 @@ function DynamicLights({ scrollProgress }: { scrollProgress: number }) {
 
   return (
     <>
-      {/* Environment map for realistic reflections — "lobby" preset gives warm indoor light */}
-      <Environment preset="lobby" />
+      {/* Environment map for realistic reflections — "sunset" preset for warm, golden hour lighting */}
+      <Environment preset="sunset" />
       <ambientLight intensity={0.35} color="#fdf6ed" />
       <directionalLight
         ref={mainRef}
@@ -679,8 +682,8 @@ export default function CoffeeScene3D() {
 
   return (
     <>
-      <fog attach="fog" args={['#f0e6d8', 10, 35]} />
-      <color attach="background" args={['#f5ebe0']} />
+      <fog attach="fog" args={['#faf5ef', 10, 35]} />
+      <color attach="background" args={['#faf5ef']} />
       <CameraController />
       <DynamicLights scrollProgress={scrollProgress} />
       

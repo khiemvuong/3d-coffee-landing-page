@@ -14,7 +14,12 @@ export default function ChapterIndicator() {
   const currentChapter = useAppStore((s) => s.currentChapter)
 
   return (
-    <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-end gap-3">
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 1, delay: 0.8, ease: 'easeOut' }}
+      className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-end gap-3"
+    >
       {chapterNames.map((name, i) => {
         const isActive = i === currentChapter
         return (
@@ -54,6 +59,6 @@ export default function ChapterIndicator() {
           </a>
         )
       })}
-    </div>
+    </motion.div>
   )
 }

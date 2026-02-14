@@ -1,6 +1,7 @@
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Canvas } from '@react-three/fiber'
-import { Preload } from '@react-three/drei'
+import { Preload, useProgress } from '@react-three/drei'
 import * as THREE from 'three'
 import Navbar from './components/Navbar'
 import { ScrollManager } from './components/ScrollManager'
@@ -22,34 +23,51 @@ import { useSmoothScroll } from './hooks/useSmoothScroll'
 
 export default function App() {
   const { isLoading, setLoading } = useAppStore()
+  const { progress } = useProgress()
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false)
   
   // Initialize smooth scroll
   useSmoothScroll()
 
+  // Minimum intro duration
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000)
+    const timer = setTimeout(() => setMinTimeElapsed(true), 2500)
     return () => clearTimeout(timer)
-  }, [setLoading])
+  }, [])
 
-  if (isLoading) {
-    return <LoadingScreen />
-  }
+  // Sync loading state with models + timer
+  useEffect(() => {
+    if (progress === 100 && minTimeElapsed) {
+      // Small extra delay for a smoother transition after everything is ready
+      const timeout = setTimeout(() => setLoading(false), 500)
+      return () => clearTimeout(timeout)
+    }
+  }, [progress, minTimeElapsed, setLoading])
 
   return (
     <>
+      <AnimatePresence>
+        {isLoading && <LoadingScreen progress={progress} />}
+      </AnimatePresence>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoading ? 0 : 1 }}
+        transition={{ duration: 1.5, ease: 'easeInOut' }}
+      >
       {/* Fixed fullscreen 3D Canvas */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 bg-[#faf5ef]">
         <Canvas
           shadows
-          dpr={[1, 1.5]}
+          dpr={[1, 2]}
           gl={{
             antialias: true,
-            alpha: false,
+            alpha: true,
+            powerPreference: 'high-performance',
             toneMapping: THREE.ACESFilmicToneMapping,
             toneMappingExposure: 1.0,
           }}
           camera={{ position: [0, 1, 7], fov: 45, near: 0.1, far: 50 }}
-          style={{ background: '#faf5ef' }}
         >
           <Suspense fallback={null}>
             <CoffeeScene3D />
@@ -76,6 +94,7 @@ export default function App() {
           <MenuChapter />
         </div>
       </div>
+    </motion.div>
     </>
   )
 }
