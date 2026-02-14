@@ -447,67 +447,82 @@ function GroundPlane() {
 function OrbitalRings({ scrollProgress }: { scrollProgress: number }) {
   const ring1Ref = useRef<THREE.Mesh>(null!)
   const ring2Ref = useRef<THREE.Mesh>(null!)
-  const ring3Ref = useRef<THREE.Mesh>(null!)
+  const groupRef = useRef<THREE.Group>(null!)
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime
+    
+    // Smooth tilt to match cup's movement
+    if (groupRef.current) {
+      groupRef.current.rotation.x = damp(groupRef.current.rotation.x, scrollProgress * Math.PI * 0.1, 1, delta)
+    }
+
+    // Dynamic scale and speed based on scroll
+    let speedMult = 0.8
+    let spreadMult = 1.0
+    let glowIntensity = 0.4
+
+    if (scrollProgress < 0.17) {
+      speedMult = 0.6; spreadMult = 1.0; glowIntensity = 0.5
+    } else if (scrollProgress < 0.33) {
+      speedMult = 1.2; spreadMult = 1.2; glowIntensity = 0.6
+    } else if (scrollProgress < 0.50) {
+      speedMult = 2.0; spreadMult = 0.7; glowIntensity = 0.8
+    } else if (scrollProgress < 0.67) {
+      speedMult = 1.5; spreadMult = 1.1; glowIntensity = 0.7
+    } else if (scrollProgress < 0.83) {
+      speedMult = 0.4; spreadMult = 1.4; glowIntensity = 0.4
+    } else {
+      speedMult = 0.8; spreadMult = 1.0; glowIntensity = 0.5
+    }
+
+    const pulse = Math.sin(t * 1.5) * 0.05
 
     if (ring1Ref.current) {
-      ring1Ref.current.rotation.x = t * 0.08 + scrollProgress * Math.PI * 2
-      ring1Ref.current.rotation.z = t * 0.04
-      const s1 = damp(ring1Ref.current.scale.x, scrollProgress < 0.5 ? 1 : 0.7, 2, delta)
+      ring1Ref.current.rotation.x = t * 0.2 * speedMult + scrollProgress * Math.PI
+      ring1Ref.current.rotation.z = t * 0.1 * speedMult
+      const s1 = damp(ring1Ref.current.scale.x, spreadMult + pulse, 2, delta)
       ring1Ref.current.scale.set(s1, s1, s1)
+      // Dynamic glow
+      const mat = ring1Ref.current.material as THREE.MeshStandardMaterial
+      mat.emissiveIntensity = damp(mat.emissiveIntensity, glowIntensity, 2, delta)
     }
+    
     if (ring2Ref.current) {
-      ring2Ref.current.rotation.x = Math.PI * 0.3 + t * 0.06
-      ring2Ref.current.rotation.y = t * 0.05 + scrollProgress * Math.PI
-      const s2 = damp(ring2Ref.current.scale.x, scrollProgress < 0.5 ? 1 : 0.8, 2, delta)
+      ring2Ref.current.rotation.y = t * -0.15 * speedMult + scrollProgress * Math.PI * 1.2
+      ring2Ref.current.rotation.z = Math.PI * 0.5 + t * 0.1 * speedMult
+      const s2 = damp(ring2Ref.current.scale.x, (spreadMult * 1.3) + pulse, 2, delta)
       ring2Ref.current.scale.set(s2, s2, s2)
-    }
-    if (ring3Ref.current) {
-      ring3Ref.current.rotation.x = -Math.PI * 0.15 + t * 0.03
-      ring3Ref.current.rotation.z = t * 0.07 + scrollProgress * Math.PI * 1.5
-      const s3 = damp(ring3Ref.current.scale.x, scrollProgress < 0.5 ? 1 : 0.65, 2, delta)
-      ring3Ref.current.scale.set(s3, s3, s3)
+      const mat = ring2Ref.current.material as THREE.MeshStandardMaterial
+      mat.emissiveIntensity = damp(mat.emissiveIntensity, glowIntensity * 0.7, 2, delta)
     }
   })
 
   return (
-    <>
-      {/* Inner ring */}
-      <mesh ref={ring1Ref} position={[0, 0, -3]}>
-        <torusGeometry args={[3.0, 0.012, 16, 120]} />
+    <group ref={groupRef} position={[0, -0.2, -2.5]}>
+      {/* Primary Gold Halo - Thinner, more professional */}
+      <mesh ref={ring1Ref}>
+        <torusGeometry args={[1.5, 0.005, 16, 128]} />
         <meshStandardMaterial
-          color="#b07840"
-          emissive="#b07840"
+          color="#d4a060"
+          emissive="#f0b860"
+          emissiveIntensity={0.5}
+          transparent
+          opacity={0.35}
+        />
+      </mesh>
+      {/* Secondary Bronze Ring - Larger, more subtle */}
+      <mesh ref={ring2Ref}>
+        <torusGeometry args={[2.2, 0.003, 12, 160]} />
+        <meshStandardMaterial
+          color="#8e4a1c"
+          emissive="#a85a24"
           emissiveIntensity={0.3}
           transparent
-          opacity={0.3}
+          opacity={0.2}
         />
       </mesh>
-      {/* Middle ring */}
-      <mesh ref={ring2Ref} position={[0, 0, -3]}>
-        <torusGeometry args={[4.5, 0.008, 16, 150]} />
-        <meshStandardMaterial
-          color="#a06830"
-          emissive="#a06830"
-          emissiveIntensity={0.2}
-          transparent
-          opacity={0.18}
-        />
-      </mesh>
-      {/* Outer ring */}
-      <mesh ref={ring3Ref} position={[0, 0, -3]}>
-        <torusGeometry args={[6.0, 0.006, 16, 180]} />
-        <meshStandardMaterial
-          color="#8a5820"
-          emissive="#8a5820"
-          emissiveIntensity={0.15}
-          transparent
-          opacity={0.1}
-        />
-      </mesh>
-    </>
+    </group>
   )
 }
 
